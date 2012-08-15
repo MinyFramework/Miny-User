@@ -38,6 +38,7 @@ class SecurityEvents extends EventHandler
         }
         if (isset($session['user']) && $this->user_provider->has($session['user'])) {
             $this->identity = $this->user_provider->get($session['user']);
+            $this->identity->authenticated = true;
         } else {
             $this->identity = $this->user_provider->create();
         }
