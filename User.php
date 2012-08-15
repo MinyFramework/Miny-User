@@ -33,7 +33,7 @@ class User
     public function __set($field, $value)
     {
         if (!property_exists($this, $field)) {
-            throw new InvalidArgumentException('Field not exists: ' . $field);
+            return;
         }
         $setter = 'set' . ucfirst(strtolower($field));
         if (method_exists($this, $setter)) {

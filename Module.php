@@ -115,7 +115,7 @@ class Module extends \Miny\Application\Module
                     foreach ($descriptor['users'] as $user) {
                         $user_blueprint = new Blueprint($class);
                         $user_blueprint->setArguments($user);
-                        $provider->addMethodCall('addUser', $user_blueprint);
+                        $provider->addMethodCall('add', $user_blueprint);
                     }
                 }
                 break;
