@@ -2,79 +2,29 @@
 
 /**
  * This file is part of the Miny framework.
+ * (c) Dániel Buga <daniel@bugadani.hu>
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * any later version accepted by the author in accordance with section
- * 14 of the GNU General Public License.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- * @package   Miny/Modules/User
- * @copyright 2012 Dániel Buga <daniel@bugadani.hu>
- * @license   http://www.gnu.org/licenses/gpl.txt
- *            GNU General Public License
- * @version   1.0
+ * For licensing information see the LICENSE file.
  */
 
 namespace Modules\User;
 
-class UserProvider
+abstract class UserProvider
 {
-    private $entities = array();
+    private $class;
 
-    public function getAnonymUser()
+    public function __construct($classname = NULL)
     {
-        return new AnonymUserIdentity;
+        $this->class = $classname ? : 'Modules\User\User';
     }
 
-    public function __construct(array $entities = array())
+    public function create(array $user_data = array())
     {
-        foreach($entities as $entity) {
-            $this->add($this->create($entity));
-        }
+        return new $this->class($user_data);
     }
 
-    public function create(array $entity_data = array())
-    {
-        $entity = new UserIdentity($entity_data);
-        $entity->setProvider($this);
-        return $entity;
-    }
-
-    public function add(UserIdentity $ent)
-    {
-        $this->entities[$ent->getKey()] = $ent;
-        return true;
-    }
-
-    public function get($key)
-    {
-        if (!$this->has($key)) {
-            throw new \OutOfBoundsException('Entity not set: ' . $key);
-        }
-        return $this->entities[$key];
-    }
-
-    public function remove($key)
-    {
-        if (isset($this->entities[$key])) {
-            unset($this->entities[$key]);
-            return true;
-        }
-    }
-
-    public function has($key)
-    {
-        return isset($this->entities[$key]);
-    }
-
-
+    public abstract function add(User $user);
+    public abstract function remove(User $user);
+    public abstract function get($key);
+    public abstract function has($key);
 }

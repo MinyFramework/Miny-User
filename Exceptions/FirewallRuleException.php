@@ -11,7 +11,7 @@ namespace Modules\User\Exceptions;
 
 use RuntimeException;
 
-class UnauthorizedException extends RuntimeException
+class FirewallRuleException extends RuntimeException
 {
 
 }
