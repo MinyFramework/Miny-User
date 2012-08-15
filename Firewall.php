@@ -14,18 +14,12 @@ use Modules\User\Exceptions\FirewallRuleException;
 
 class Firewall
 {
-    private $rules = array();
     private $paths = array();
     private $permissions;
 
     public function __construct(PermissionChecker $permissions)
     {
         $this->permissions = $permissions;
-    }
-
-    public function addRule($name, $rule)
-    {
-        $this->rules[$name] = $rule;
     }
 
     public function protectPath($path, $rule_name)

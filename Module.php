@@ -24,28 +24,24 @@ class Module extends \Miny\Application\Module
     {
         $permissions = $app->add('permissions', __NAMESPACE__ . '\PermissionChecker');
 
-        if (isset($app['firewall:permissions'])) {
-            $this->addPermissionsFromConfig($app['firewall:permissions'], $permissions);
-        }
-
         $firewall = $app->add('firewall', __NAMESPACE__ . '\Firewall')
                 ->setArguments('&permissions');
-
-        if (isset($app['firewall:rules'])) {
-            foreach ($app['firewall:rules'] as $name => $rule) {
-                $firewall->addMethodCall('addRule', $name, $rule);
-            }
-        }
-        if (isset($app['firewall:protected'])) {
-            foreach ($app['firewall:protected'] as $path => $rule) {
-                $firewall->addMethodCall('protectPath', $path, $rule);
-            }
-        }
 
         $app->add('security_events', __NAMESPACE__ . '\SecurityEvents')
                 ->addMethodCall('setUserProvider', '&user_provider')
                 ->addMethodCall('setFirewall', '&firewall')
                 ->addMethodCall('authenticate', '&session');
+
+        if (isset($app['firewall']['permissions'])) {
+            $this->addPermissionsFromConfig($app['firewall']['permissions'], $permissions);
+        }
+
+        if (isset($app['firewall']['protected'])) {
+            foreach ($app['firewall']['protected'] as $path => $rule) {
+                $firewall->addMethodCall('protectPath', $path, $rule);
+            }
+        }
+
 
         if (isset($app['users'])) {
             $app->register('user_provider', $this->createUserProvider($app['users']));
