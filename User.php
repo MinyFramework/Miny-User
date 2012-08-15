@@ -52,4 +52,9 @@ class User
         return method_exists($this, $getter) ? $this->$getter() : $this->$field;
     }
 
+    public function toArray()
+    {
+        return get_object_vars($this);
+    }
+
 }
