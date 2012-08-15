@@ -14,6 +14,7 @@ use Miny\Factory\Blueprint;
 use Modules\User\Permissions\PropertyContainsPermission;
 use Modules\User\Permissions\PropertyEqualsPermission;
 use Modules\User\Permissions\PropertyExistsPermission;
+use Modules\User\Permissions\PropertyInPermission;
 use Modules\User\Permissions\PropertyRegexPermission;
 use RuntimeException;
 use UnexpectedValueException;
@@ -60,6 +61,9 @@ class Module extends \Miny\Application\Module
             'property_contains' => array(
                 'property', 'value'
             ),
+            'property_in' => array(
+                'property', 'array'
+            ),
             'property_regex' => array(
                 'property', 'pattern'
             )
@@ -87,6 +91,9 @@ class Module extends \Miny\Application\Module
                     break;
                 case 'property_contains':
                     $permission_object = new PropertyContainsPermission($permission['property'], $permission['value']);
+                    break;
+                case 'property_in':
+                    $permission_object = new PropertyInPermission($permission['property'], $permission['array']);
                     break;
                 case 'property_regex':
                     $permission_object = new PropertyRegexPermission($permission['property'], $permission['pattern']);
