@@ -43,7 +43,6 @@ class Module extends \Miny\Application\Module
             }
         }
 
-
         if (isset($app['users'])) {
             $app->register('user_provider', $this->createUserProvider($app['users']));
         }
@@ -121,6 +120,16 @@ class Module extends \Miny\Application\Module
                         $provider->addMethodCall('add', $user_blueprint);
                     }
                 }
+                break;
+            case 'orm':
+                $this->application->module('ORM');
+                $provider = new Blueprint(__NAMESPACE__ . '\Providers\ORM');
+
+                $table = isset($descriptor['table']) ? $descriptor['table'] : 'user';
+                $key = isset($descriptor['key']) ? $descriptor['key'] : 'name';
+                $classname = isset($descriptor['class']) ? $descriptor['class'] : NULL;
+
+                $provider->setArguments('&orm', $table, $key, $classname);
                 break;
             case 'chain':
                 $provider = new Blueprint(__NAMESPACE__ . '\Providers\Chain');
