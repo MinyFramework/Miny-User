@@ -33,13 +33,15 @@ class Module extends \Miny\Application\Module
                 ->addMethodCall('setFirewall', '&firewall')
                 ->addMethodCall('authenticate', '&session');
 
-        if (isset($app['firewall']['permissions'])) {
-            $this->addPermissionsFromConfig($app['firewall']['permissions'], $permissions);
-        }
+        if (isset($app['firewall'])) {
+            if (isset($app['firewall']['permissions'])) {
+                $this->addPermissionsFromConfig($app['firewall']['permissions'], $permissions);
+            }
 
-        if (isset($app['firewall']['protected'])) {
-            foreach ($app['firewall']['protected'] as $path => $rule) {
-                $firewall->addMethodCall('protectPath', $path, $rule);
+            if (isset($app['firewall']['protected'])) {
+                foreach ($app['firewall']['protected'] as $path => $rule) {
+                    $firewall->addMethodCall('protectPath', $path, $rule);
+                }
             }
         }
 
