@@ -21,7 +21,7 @@ class User
     public function __construct(array $data = array())
     {
         foreach ($data as $key => $value) {
-            $this->$key = $value;
+            $this->__set($key, $value);
         }
     }
 
