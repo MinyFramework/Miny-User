@@ -54,17 +54,25 @@ class SecurityEvents extends EventHandler
 
         $get = $event->getParameter('request')->get;
 
-        $this->check($get['controller']);
-
-        if (isset($get['action'])) {
-            $this->check($get['controller'] . '/' . $get['action']);
+        if ($this->checkPath($event, $get['controller'])) {
+            if (isset($get['action'])) {
+                $this->checkPath($event, $get['controller'] . '/' . $get['action']);
+            }
         }
     }
 
-    protected function check($path)
+    protected function checkPath(Event $event, $path)
     {
-        if (!$this->firewall->checkPath($path, $this->identity)) {
+        $return = $this->firewall->checkPath($path, $this->identity);
+        if (!$return) {
             throw new UnauthorizedException('Access denied: ' . $path);
+        } elseif (is_string($return)) {
+            $request = clone $event->getParameter('request');
+            $request->path = $return;
+
+            $event->setResponse($request);
+        } else {
+            return true;
         }
     }
 

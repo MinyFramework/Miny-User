@@ -34,12 +34,18 @@ class Module extends \Miny\Application\Module
                 ->addMethodCall('authenticate', '&session');
 
         if (isset($app['firewall'])) {
-            if (isset($app['firewall']['permissions'])) {
-                $this->addPermissionsFromConfig($app['firewall']['permissions'], $permissions);
+            $firewall_config = $app['firewall'];
+
+            if (isset($firewall_config['default_redirect_path'])) {
+                $firewall->addMethodCall('setDefaultRedirectPath', $firewall_config['default_redirect_path']);
             }
 
-            if (isset($app['firewall']['protected'])) {
-                foreach ($app['firewall']['protected'] as $path => $rule) {
+            if (isset($firewall_config['permissions'])) {
+                $this->addPermissionsFromConfig($firewall_config['permissions'], $permissions);
+            }
+
+            if (isset($firewall_config['protected'])) {
+                foreach ($firewall_config['protected'] as $path => $rule) {
                     $firewall->addMethodCall('protectPath', $path, $rule);
                 }
             }
