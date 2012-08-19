@@ -37,7 +37,7 @@ class ORM extends UserProvider
             if (!$user) {
                 throw new OutOfBoundsException('User not found: ' . $key);
             }
-            $this->users[$key] = $this->create($user);
+            $this->users[$key] = $this->create($user->toArray());
         }
         return $this->users[$key];
     }
