@@ -120,10 +120,12 @@ class Module extends \Miny\Application\Module
                 throw new UnexpectedValueException('Unknown user provider type: ' . $descriptor['provider']);
             case 'memory':
                 $provider = new Blueprint(__NAMESPACE__ . '\Providers\Memory');
+                $classname = isset($descriptor['class']) ? $descriptor['class'] : __NAMESPACE__ . '\User';
+                $provider->setArguments(array(), $classname);
+
                 if (isset($descriptor['users'])) {
-                    $class = isset($descriptor['user_class']) ? $descriptor['user_class'] : __NAMESPACE__ . '\User';
                     foreach ($descriptor['users'] as $user) {
-                        $user_blueprint = new Blueprint($class);
+                        $user_blueprint = new Blueprint($classname);
                         $user_blueprint->setArguments($user);
                         $provider->addMethodCall('add', $user_blueprint);
                     }
