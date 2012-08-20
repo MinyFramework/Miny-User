@@ -12,34 +12,40 @@ namespace Modules\User;
 class PermissionChecker
 {
     protected $permissions = array();
+    protected $user;
+
+    public function setUser(User $user)
+    {
+        $this->user = $user;
+    }
 
     public function addPermission($name, iPermission $permission)
     {
         $this->permissions[$name] = $permission;
     }
 
-    public function has(User $user, $permission)
+    public function has($permission, User $user = NULL)
     {
         if (!isset($this->permissions[$permission])) {
             throw new \OutOfBoundsException('Permission not found: ' . $permission);
         }
-        return $this->permissions[$permission]->userHasPermission($user);
+        return $this->permissions[$permission]->userHasPermission($user ? : $this->user);
     }
 
-    public function any(User $user, array $permissions)
+    public function any(array $permissions, User $user = NULL)
     {
         foreach ($permissions as $permission) {
-            if ($this->has($user, $permission)) {
+            if ($this->has($permission, $user)) {
                 return true;
             }
         }
         return false;
     }
 
-    public function all(User $user, array $permissions)
+    public function all(array $permissions, User $user = NULL)
     {
         foreach ($permissions as $permission) {
-            if (!$this->has($user, $permission)) {
+            if (!$this->has($permission, $user)) {
                 return false;
             }
         }

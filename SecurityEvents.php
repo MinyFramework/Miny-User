@@ -19,7 +19,6 @@ class SecurityEvents extends EventHandler
 {
     private $firewall;
     private $user_provider;
-    private $identity;
     private $authenticated;
 
     public function setFirewall(Firewall $firewall)
@@ -38,12 +37,15 @@ class SecurityEvents extends EventHandler
             return;
         }
         if (isset($session['user']) && $this->user_provider->has($session['user'])) {
-            $this->identity = $this->user_provider->get($session['user']);
-            $this->identity->authenticated = true;
+            $identity = $this->user_provider->get($session['user']);
+            $identity->authenticated = true;
         } else {
-            $this->identity = $this->user_provider->create();
+            $identity = $this->user_provider->create();
         }
-        $app->identity = $this->identity;
+
+        $app->user = $identity;
+        $app->permissions->setUser($identity);
+
         $this->authenticated = true;
     }
 
@@ -64,7 +66,7 @@ class SecurityEvents extends EventHandler
 
     protected function checkPath(Event $event, $path)
     {
-        $return = $this->firewall->checkPath($path, $this->identity);
+        $return = $this->firewall->checkPath($path);
         if (!$return) {
             throw new UnauthorizedException('Access denied: ' . $path);
         } elseif (is_string($return)) {

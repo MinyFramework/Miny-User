@@ -24,6 +24,11 @@ class Firewall
         $this->permissions = $permissions;
     }
 
+    public function getPermissionChecker()
+    {
+        return $this->permissions;
+    }
+
     public function setDefaultRedirectPath($default_redirect)
     {
         $this->default_redirect = $default_redirect;
@@ -40,7 +45,7 @@ class Firewall
         }
     }
 
-    public function checkPath($path, User $user)
+    public function checkPath($path, User $user = NULL)
     {
         if (!isset($this->paths[$path])) {
             return true;
@@ -48,9 +53,9 @@ class Firewall
         $rule = $this->paths[$path];
 
         if (is_string($rule)) {
-            $return = $this->permissions->has($user, $rule);
+            $return = $this->permissions->has($rule, $user);
         } elseif (is_array($rule)) {
-            $return = $this->permissions->all($user, $rule);
+            $return = $this->permissions->all($rule, $user);
         } elseif ($rule instanceof Closure) {
             $return = $rule($user);
         } else {
