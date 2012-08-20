@@ -9,6 +9,7 @@
 
 namespace Modules\User;
 
+use Miny\Application\Application;
 use Miny\Event\Event;
 use Miny\Event\EventHandler;
 use Miny\Session\Session;
@@ -31,7 +32,7 @@ class SecurityEvents extends EventHandler
         $this->user_provider = $user_provider;
     }
 
-    public function authenticate(Session $session)
+    public function authenticate(Session $session, Application $app)
     {
         if (is_null($this->user_provider) || $this->authenticated) {
             return;
@@ -42,7 +43,7 @@ class SecurityEvents extends EventHandler
         } else {
             $this->identity = $this->user_provider->create();
         }
-
+        $app->identity = $this->identity;
         $this->authenticated = true;
     }
 

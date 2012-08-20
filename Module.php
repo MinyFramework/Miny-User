@@ -31,7 +31,7 @@ class Module extends \Miny\Application\Module
         $app->add('security_events', __NAMESPACE__ . '\SecurityEvents')
                 ->addMethodCall('setUserProvider', '&user_provider')
                 ->addMethodCall('setFirewall', '&firewall')
-                ->addMethodCall('authenticate', '&session');
+                ->addMethodCall('authenticate', '&session', '&app');
 
         if (isset($app['firewall'])) {
             $firewall_config = $app['firewall'];
