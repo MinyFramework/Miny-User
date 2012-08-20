@@ -28,10 +28,8 @@ class Module extends \Miny\Application\Module
         $firewall = $app->add('firewall', __NAMESPACE__ . '\Firewall')
                 ->setArguments('&permissions');
 
-        $app->add('security_events', __NAMESPACE__ . '\SecurityEvents')
-                ->addMethodCall('setUserProvider', '&user_provider')
-                ->addMethodCall('setFirewall', '&firewall')
-                ->addMethodCall('authenticate', '&session', '&app');
+        $events = new Blueprint(__NAMESPACE__ . '\SecurityEvents');
+        $events->addMethodCall('setFirewall', '&firewall');
 
         if (isset($app['firewall'])) {
             $firewall_config = $app['firewall'];
@@ -53,6 +51,12 @@ class Module extends \Miny\Application\Module
 
         if (isset($app['users'])) {
             $app->register('user_provider', $this->createUserProvider($app['users']));
+
+            $events->addMethodCall('setUserProvider', '&user_provider');
+            $events->addMethodCall('authenticate', '&session', '&app');
+
+            $app->getBlueprint('events')
+                    ->addMethodCall('setHandler', 'filter_request', $events, 'authorize');
         }
     }
 
