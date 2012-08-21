@@ -11,11 +11,11 @@ namespace Modules\User;
 
 use Miny\Application\Application;
 use Miny\Event\Event;
-use Miny\Event\EventHandler;
+use Miny\HTTP\Request;
 use Miny\Session\Session;
 use Modules\User\Exceptions\UnauthorizedException;
 
-class SecurityEvents extends EventHandler
+class SecurityEvents
 {
     private $firewall;
     private $user_provider;
@@ -49,28 +49,28 @@ class SecurityEvents extends EventHandler
         $this->authenticated = true;
     }
 
-    public function authorize(Event $event)
+    public function authorize(Event $event, Request $request)
     {
         if (!$this->authenticated || is_null($this->firewall)) {
             return;
         }
 
-        $get = $event->getParameter('request')->get;
+        $get = $request->get;
 
-        if ($this->checkPath($event, $get['controller'])) {
+        if ($this->checkPath($event, $request, $get['controller'])) {
             if (isset($get['action'])) {
-                $this->checkPath($event, $get['controller'] . '/' . $get['action']);
+                $this->checkPath($event, $request, $get['controller'] . '/' . $get['action']);
             }
         }
     }
 
-    protected function checkPath(Event $event, $path)
+    protected function checkPath(Event $event, Request $main_request, $path)
     {
         $return = $this->firewall->checkPath($path);
         if (!$return) {
             throw new UnauthorizedException('Access denied: ' . $path);
         } elseif (is_string($return)) {
-            $request = clone $event->getParameter('request');
+            $request = clone $main_request;
             $request->path = $return;
 
             $event->setResponse($request);

@@ -56,7 +56,7 @@ class Module extends \Miny\Application\Module
             $events->addMethodCall('authenticate', '&session', '&app');
 
             $app->getBlueprint('events')
-                    ->addMethodCall('setHandler', 'filter_request', $events, 'authorize');
+                    ->addMethodCall('register', 'filter_request', array($events, 'authorize'));
         }
     }
 
