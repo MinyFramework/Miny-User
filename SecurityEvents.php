@@ -49,7 +49,7 @@ class SecurityEvents
         $this->authenticated = true;
     }
 
-    public function authorize(Event $event, Request $request)
+    public function authorize(Request $request)
     {
         if (!$this->authenticated || is_null($this->firewall)) {
             return;
@@ -57,25 +57,25 @@ class SecurityEvents
 
         $get = $request->get;
 
-        if ($this->checkPath($event, $request, $get['controller'])) {
-            if (isset($get['action'])) {
-                $this->checkPath($event, $request, $get['controller'] . '/' . $get['action']);
-            }
+        $r = $this->checkPath($request, $get['controller']);
+        if (!$r && isset($get['action'])) {
+            $r = $this->checkPath($request, $get['controller'] . '/' . $get['action']);
+        }
+        if ($r instanceof Request) {
+            return $r;
         }
     }
 
-    protected function checkPath(Event $event, Request $main_request, $path)
+    protected function checkPath(Request $main_request, $path)
     {
         $return = $this->firewall->checkPath($path);
         if (!$return) {
             throw new UnauthorizedException('Access denied: ' . $path);
         } elseif (is_string($return)) {
+
             $request = clone $main_request;
             $request->path = $return;
-
-            $event->setResponse($request);
-        } else {
-            return true;
+            return $request;
         }
     }
 
