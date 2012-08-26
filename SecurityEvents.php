@@ -10,7 +10,6 @@
 namespace Modules\User;
 
 use Miny\Application\Application;
-use Miny\Event\Event;
 use Miny\HTTP\Request;
 use Miny\Session\Session;
 use Modules\User\Exceptions\UnauthorizedException;
