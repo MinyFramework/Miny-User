@@ -9,7 +9,7 @@
 
 namespace Modules\User;
 
-use Miny\Application\Application;
+use Miny\Application\BaseApplication;
 use Miny\Factory\Blueprint;
 use Modules\User\Permissions\PropertyContainsPermission;
 use Modules\User\Permissions\PropertyEqualsPermission;
@@ -21,7 +21,7 @@ use UnexpectedValueException;
 
 class Module extends \Miny\Application\Module
 {
-    public function init(Application $app)
+    public function init(BaseApplication $app)
     {
         $permissions = $app->add('permissions', __NAMESPACE__ . '\PermissionChecker');
 
