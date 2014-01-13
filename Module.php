@@ -19,7 +19,7 @@ use Modules\User\Permissions\PropertyRegexPermission;
 use RuntimeException;
 use UnexpectedValueException;
 
-class Module extends \Miny\Application\Module
+class Module extends \Miny\Modules\Module
 {
     public function init(BaseApplication $app)
     {
