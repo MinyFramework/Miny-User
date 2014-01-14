@@ -21,18 +21,22 @@ use UnexpectedValueException;
 
 class Module extends \Miny\Modules\Module
 {
+
     public function init(BaseApplication $app)
     {
-        $permissions = $app->add('permissions', __NAMESPACE__ . '\PermissionChecker');
+        $factory    = $app->getFactory();
+        $parameters = $factory->getParameters();
 
-        $firewall = $app->add('firewall', __NAMESPACE__ . '\Firewall')
+        $permissions = $factory->add('permissions', __NAMESPACE__ . '\PermissionChecker');
+
+        $firewall = $factory->add('firewall', __NAMESPACE__ . '\Firewall')
                 ->setArguments('&permissions');
 
         $events = new Blueprint(__NAMESPACE__ . '\SecurityEvents');
         $events->addMethodCall('setFirewall', '&firewall');
 
-        if (isset($app['firewall'])) {
-            $firewall_config = $app['firewall'];
+        if (isset($parameters['firewall'])) {
+            $firewall_config = $parameters['firewall'];
 
             if (isset($firewall_config['default_redirect_path'])) {
                 $firewall->addMethodCall('setDefaultRedirectPath', $firewall_config['default_redirect_path']);
@@ -49,13 +53,13 @@ class Module extends \Miny\Modules\Module
             }
         }
 
-        if (isset($app['users'])) {
-            $app->register('user_provider', $this->createUserProvider($app['users']));
+        if (isset($parameters['users'])) {
+            $factory->register('user_provider', $this->createUserProvider($parameters['users']));
 
             $events->addMethodCall('setUserProvider', '&user_provider');
             $events->addMethodCall('authenticate', '&session', '&app');
 
-            $app->getBlueprint('events')
+            $factory->getBlueprint('events')
                     ->addMethodCall('register', 'filter_request', array($events, 'authorize'));
         }
     }
@@ -63,19 +67,19 @@ class Module extends \Miny\Modules\Module
     private function addPermissionsFromConfig(array $array, Blueprint $permissions)
     {
         $permission_arguments = array(
-            'property_exists' => array(
+            'property_exists'   => array(
                 'property'
             ),
-            'property_equals' => array(
+            'property_equals'   => array(
                 'property', 'value'
             ),
             'property_contains' => array(
                 'property', 'value'
             ),
-            'property_in' => array(
+            'property_in'       => array(
                 'property', 'array'
             ),
-            'property_regex' => array(
+            'property_regex'    => array(
                 'property', 'pattern'
             )
         );
@@ -122,8 +126,9 @@ class Module extends \Miny\Modules\Module
         switch ($descriptor['provider']) {
             default:
                 throw new UnexpectedValueException('Unknown user provider type: ' . $descriptor['provider']);
+
             case 'memory':
-                $provider = new Blueprint(__NAMESPACE__ . '\Providers\Memory');
+                $provider  = new Blueprint(__NAMESPACE__ . '\Providers\Memory');
                 $classname = isset($descriptor['class']) ? $descriptor['class'] : __NAMESPACE__ . '\User';
                 $provider->setArguments(array(), $classname);
 
@@ -135,16 +140,18 @@ class Module extends \Miny\Modules\Module
                     }
                 }
                 break;
+
             case 'orm':
                 $this->application->module('ORM');
                 $provider = new Blueprint(__NAMESPACE__ . '\Providers\ORM');
 
-                $table = isset($descriptor['table']) ? $descriptor['table'] : 'user';
-                $key = isset($descriptor['key']) ? $descriptor['key'] : 'name';
+                $table     = isset($descriptor['table']) ? $descriptor['table'] : 'user';
+                $key       = isset($descriptor['key']) ? $descriptor['key'] : 'name';
                 $classname = isset($descriptor['class']) ? $descriptor['class'] : NULL;
 
                 $provider->setArguments('&orm', $table, $key, $classname);
                 break;
+            
             case 'chain':
                 $provider = new Blueprint(__NAMESPACE__ . '\Providers\Chain');
                 if (isset($descriptor['providers'])) {
@@ -156,5 +163,4 @@ class Module extends \Miny\Modules\Module
         }
         return $provider;
     }
-
 }
