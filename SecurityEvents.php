@@ -11,7 +11,7 @@ namespace Modules\User;
 
 use Miny\Application\Application;
 use Miny\HTTP\Request;
-use Miny\Session\Session;
+use Miny\HTTP\Session;
 use Modules\User\Exceptions\UnauthorizedException;
 
 class SecurityEvents
