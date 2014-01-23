@@ -57,7 +57,7 @@ class Module extends \Miny\Modules\Module
             $factory->register('user_provider', $this->createUserProvider($parameters['users']));
 
             $events->addMethodCall('setUserProvider', '&user_provider');
-            $events->addMethodCall('authenticate', '&session', '&app');
+            $events->addMethodCall('authenticate', '&session', '&factory');
 
             $factory->getBlueprint('events')
                     ->addMethodCall('register', 'filter_request', array($events, 'authorize'));
@@ -151,7 +151,7 @@ class Module extends \Miny\Modules\Module
 
                 $provider->setArguments('&orm', $table, $key, $classname);
                 break;
-            
+
             case 'chain':
                 $provider = new Blueprint(__NAMESPACE__ . '\Providers\Chain');
                 if (isset($descriptor['providers'])) {

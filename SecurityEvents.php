@@ -9,7 +9,7 @@
 
 namespace Modules\User;
 
-use Miny\Application\Application;
+use Miny\Factory\Factory;
 use Miny\HTTP\Request;
 use Miny\HTTP\Session;
 use Modules\User\Exceptions\UnauthorizedException;
@@ -30,7 +30,7 @@ class SecurityEvents
         $this->user_provider = $user_provider;
     }
 
-    public function authenticate(Session $session, Application $app)
+    public function authenticate(Session $session, Factory $factory)
     {
         if (is_null($this->user_provider) || $this->authenticated) {
             return;
@@ -42,8 +42,8 @@ class SecurityEvents
             $identity = $this->user_provider->create();
         }
 
-        $app->user = $identity;
-        $app->permissions->setUser($identity);
+        $factory->user = $identity;
+        $factory->permissions->setUser($identity);
 
         $this->authenticated = true;
     }
